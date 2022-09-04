@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Roles {
+  id            String  @id @default(uuid())
+  role_name     String
+  previlage_num String
+  Users         Users[]
+}
+
+model Users {
+  id                  String                @id @default(uuid())
+  usernmae            String
+  password            String
+  role                Roles                 @relation(fields: [role_id], references: [id])
+  role_id             String
+  Files               Files[]
+  Field_Identifaction Field_Identifaction[]
+
+  @@unique([usernmae])
+}
+
+model Files {
+  id                  String                @id @default(uuid())
+  file_name           String
+  path                String
+  updated_at          DateTime
+  created_at          DateTime
+  created_by          Users                 @relation(fields: [created_by_user], references: [id])
+  created_by_user     String
+  Field_Identifaction Field_Identifaction[]
+}
+
+model Identification {
+  id                        String                @id @default(uuid())
+  identifaction_name        String
+  identifaction_description String
+  Field_Identifaction       Field_Identifaction[]
+}
+
+model Status {
+  id                  String                @id @default(uuid())
+  status_name         String
+  Field_Identifaction Field_Identifaction[]
+}
+
+model Field_Identifaction {
+  id                String         @id @default(uuid())
+  file              Files          @relation(fields: [filesId], references: [id])
+  filesId           String
+  status            Status         @relation(fields: [statusId], references: [id])
+  statusId          String
+  user              Users          @relation(fields: [updated_by], references: [id])
+  updated_by        String
+  idenity           Identification @relation(fields: [identification_id], references: [id])
+  identification_id String
+  value             String
+}
+
+model Logs {
+  id         String   @id @default(uuid())
+  action     String
+  updated_at DateTime
+}
+
+model UploadedFile {
+  file Bytes @unique
+}
+
+model UsedTokens {
+  id    String @id @default(uuid())
+  Token String
+}
